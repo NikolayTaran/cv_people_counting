@@ -1,0 +1,23 @@
+# Core dependencies (Python 3.10+; tested on 3.12).
+#
+# torch is pulled from the CPU-only wheel index (no CUDA bundles:
+# ~500 MB instead of ~2.5 GB) — the pipeline runs on CPU by design.
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy>=1.26
+torch>=2.2
+ultralytics>=8.3.40
+opencv-python-headless>=4.9
+scipy>=1.11
+pandas>=2.2
+motmetrics>=1.4
+matplotlib>=3.8
+pyyaml>=6.0
+tqdm>=4.66
+
+# dataset download helpers
+remotezip>=0.12     # selective HTTP-range zip extraction (MOT17/MOT20)
+gdown>=5.2          # VisDrone from the official Google Drive (optional)
+
+# development
+pytest>=8.0
+ruff>=0.8

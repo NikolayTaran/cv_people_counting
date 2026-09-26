@@ -1,0 +1,129 @@
+# ---------------------------------------------------------------------------
+# Evaluation protocol — which sequence demonstrates which condition.
+#
+#   occlusion   MOT17-02 (barrier/umbrella occlusions), MOT17-05 (street
+#               furniture, standing crowd partially occluding walkers)
+#   crowding    MOT17-04 (avg ~83 people/frame street scene),
+#               MOT20-01 (extreme density, avg ~47/frame, indoor mall)
+#   camera_view MOT17-09 (static, low-angle), MOT17-11 (moving handheld),
+#               VisDrone val sequence (aerial drone view, ROI mode)
+#
+# Counting geometry is specified as fractions of the frame size:
+#   line   p1/p2 endpoints; a person crossing towards the positive side of
+#          p1->p2 (right of the direction vector) counts as IN
+#   region polygon vertices; enter/exit events with hysteresis
+# ---------------------------------------------------------------------------
+
+defaults:
+  detector:
+    weights: yolo11n.pt        # COCO-pretrained, person class
+    min_conf: 0.05             # low floor — ByteTrack stratifies itself
+    nms_iou: 0.7
+  tracker:                     # ByteTrack (custom implementation)
+    high_thresh: 0.5
+    match_thresh: 0.8          # stage-1 gate on IoU distance (IoU > 0.2)
+    match_thresh_low: 0.5      # stage-2 gate for weak detections
+    max_age: 30                # frames a confirmed track survives occlusion
+    n_init: 3                  # hits needed before a track may count
+    min_box_area: 10.0
+    motion_compensation: false
+  counting:
+    mode: line
+    min_hits: 3
+
+sequences:
+  # ---------------- occlusion ----------------
+  - name: MOT17-02-FRCNN
+    dataset: MOT17
+    condition: occlusion
+    tags: [static-elevated, medium-density]
+    seq_dir: data/MOT17/train/MOT17-02-FRCNN
+    imgsz: 1280                # small/distant people -> higher inference res
+    counting:
+      mode: line
+      line: { p1: [0.50, 0.08], p2: [0.50, 0.92], in_direction: positive }
+      arm_dist: 10
+      cooldown: 8
+
+  - name: MOT17-05-FRCNN
+    dataset: MOT17
+    condition: occlusion
+    tags: [static-elevated, low-density]
+    seq_dir: data/MOT17/train/MOT17-05-FRCNN
+    imgsz: 640
+    counting:
+      mode: line
+      line: { p1: [0.50, 0.08], p2: [0.50, 0.92], in_direction: positive }
+      arm_dist: 10
+      cooldown: 8
+
+  # ---------------- crowding ----------------
+  - name: MOT17-04-FRCNN
+    dataset: MOT17
+    condition: crowding
+    tags: [static-elevated, high-density]
+    seq_dir: data/MOT17/train/MOT17-04-FRCNN
+    imgsz: 1280                # dense small people -> higher inference res
+    counting:
+      mode: line
+      line: { p1: [0.50, 0.08], p2: [0.50, 0.92], in_direction: positive }
+      arm_dist: 12
+      cooldown: 8
+
+  - name: MOT20-01
+    dataset: MOT20
+    condition: crowding
+    tags: [static-elevated, extreme-density]
+    seq_dir: data/MOT20/train/MOT20-01
+    imgsz: 1280                # extreme density -> higher inference res
+    counting:
+      mode: line
+      line: { p1: [0.50, 0.08], p2: [0.50, 0.92], in_direction: positive }
+      arm_dist: 12
+      cooldown: 8
+
+  # ---------------- camera views ----------------
+  - name: MOT17-09-FRCNN
+    dataset: MOT17
+    condition: camera_view
+    tags: [static-low-angle, low-density]
+    seq_dir: data/MOT17/train/MOT17-09-FRCNN
+    imgsz: 640
+    counting:
+      mode: line
+      line: { p1: [0.50, 0.08], p2: [0.50, 0.92], in_direction: positive }
+      arm_dist: 10
+      cooldown: 8
+
+  - name: MOT17-11-FRCNN
+    dataset: MOT17
+    condition: camera_view
+    tags: [moving-handheld, low-density]
+    seq_dir: data/MOT17/train/MOT17-11-FRCNN
+    imgsz: 640
+    tracker:
+      motion_compensation: true   # phase-correlation global motion compensation
+    counting:
+      mode: line
+      line: { p1: [0.50, 0.08], p2: [0.50, 0.92], in_direction: positive }
+      arm_dist: 10
+      cooldown: 8
+
+  # ---------------- camera view: aerial (VisDrone) ----------------
+  # Downloaded separately (scripts/download_data.py visdrone); the runner
+  # skips this entry gracefully when the data is not present.
+  - name: VisDrone-uav0000117_02622_v
+    dataset: VisDrone
+    condition: camera_view
+    tags: [aerial-drone, region-counting, medium-density]
+    seq_dir: data/VisDrone/VisDrone2019-MOT-val/sequences/uav0000117_02622_v
+    ann_dir: data/VisDrone/VisDrone2019-MOT-val/annotations
+    fps: 10
+    imgsz: 1280
+    tracker:
+      high_thresh: 0.40       # only confident detections may start tracks
+    counting:
+      mode: region
+      region:
+        polygon: [[0.30, 0.25], [0.72, 0.25], [0.72, 0.80], [0.30, 0.80]]
+      hysteresis: 2
