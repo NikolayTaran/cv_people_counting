@@ -1,5 +1,5 @@
 # Core dependencies (Python 3.10+; tested on 3.12).
-#
+#qwerty
 # torch is pulled from the CPU-only wheel index (no CUDA bundles:
 # ~500 MB instead of ~2.5 GB) — the pipeline runs on CPU by design.
 --extra-index-url https://download.pytorch.org/whl/cpu
