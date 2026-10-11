@@ -1,0 +1,17 @@
+{
+  "base_model": "yolo11s.pt",
+  "final_model": "models\\people_yolo11s_mot.pt",
+  "epochs_requested": 3,
+  "imgsz": 640,
+  "batch": 8,
+  "workers": 0,
+  "seed": 42,
+  "metrics": {
+    "metrics/precision(B)": 0.9712161804338646,
+    "metrics/recall(B)": 0.8911348612805137,
+    "metrics/mAP50(B)": 0.9635850274033361,
+    "metrics/mAP50-95(B)": 0.6780589505845709,
+    "fitness": 0.6780589505845709
+  },
+  "run_dir": "outputs\\training\\yolo11s_mot_people_3ep"
+}

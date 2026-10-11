@@ -18,9 +18,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
 
-from people_counter.config import load_config                   # noqa: E402
-from people_counter.detection.yolo_detector import YoloDetector  # noqa: E402
-from people_counter.pipeline import run_sequence                # noqa: E402
+from people_counter.config import load_config
+from people_counter.detection.yolo_detector import YoloDetector
+from people_counter.pipeline import run_sequence
 
 
 def main() -> None:
@@ -28,7 +28,12 @@ def main() -> None:
     parser.add_argument("--config", default=str(REPO / "configs" / "sequences.yaml"))
     parser.add_argument("--seq", action="append",
                         help="sequence name (repeatable); default: all")
+    parser.add_argument("--split", choices=["development", "test"],
+                        help="run only one protocol split")
     parser.add_argument("--max-frames", type=int, default=None)
+    parser.add_argument("--weights", help="override detector weights for every sequence")
+    parser.add_argument("--device", default="auto", help="auto, cpu, or CUDA device such as 0")
+    parser.add_argument("--imgsz", type=int, help="override inference size for every sequence")
     parser.add_argument("--no-render", action="store_true")
     parser.add_argument("--out-dir", default=str(REPO / "outputs" / "runs"))
     parser.add_argument("--video-dir", default=str(REPO / "outputs" / "videos"))
@@ -42,6 +47,8 @@ def main() -> None:
         missing = names - {s["name"] for s in sequences}
         if missing:
             parser.error(f"unknown sequence(s): {sorted(missing)}")
+    if args.split:
+        sequences = [s for s in sequences if s.get("split") == args.split]
 
     # skip sequences whose data is not on disk (e.g. VisDrone not downloaded)
     runnable = []
@@ -58,10 +65,18 @@ def main() -> None:
 
     detector_cache: dict[str, YoloDetector] = {}
     for seq in runnable:
+        if args.weights:
+            seq["detector"]["weights"] = args.weights
+        if args.imgsz:
+            seq["imgsz"] = args.imgsz
         weights = seq["detector"]["weights"]
+        candidate = REPO / weights
+        if candidate.is_file():
+            weights = str(candidate)
+            seq["detector"]["weights"] = weights
         if weights not in detector_cache:
             print(f"[run] loading detector {weights} ...", flush=True)
-            detector_cache[weights] = YoloDetector(weights)
+            detector_cache[weights] = YoloDetector(weights, device=args.device)
         run_sequence(
             seq,
             repo_root=REPO,

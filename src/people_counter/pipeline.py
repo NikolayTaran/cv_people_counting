@@ -11,7 +11,7 @@ from .annotation import annotate_frame
 from .config import resolve_seq_paths
 from .counting.counter import CountingEvent
 from .datasets.gt_counter import build_counter
-from .datasets.mot import (SequenceInfo, load_mot_sequence, load_visdrone_sequence)
+from .datasets.mot import SequenceInfo, load_mot_sequence, load_visdrone_sequence
 from .tracking.bytetrack import ByteTracker
 from .tracking.track import foot_point
 from .video import VideoSink
@@ -125,6 +125,8 @@ def run_sequence(seq_cfg: dict, repo_root: Path, out_dir: Path,
             "motion_compensation": mc,
             "counting_cfg": cfg["counting"],
             "tracker_cfg": cfg["tracker"],
+            "detector_cfg": cfg["detector"],
+            "detector_device": getattr(detector, "device", "unknown"),
             "wall_seconds": round(wall, 2),
             "processing_fps": round(n_frames / wall, 2) if wall else None,
             "video": str(render_path) if render_path else None,

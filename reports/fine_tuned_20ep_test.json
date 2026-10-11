@@ -1,0 +1,271 @@
+{
+  "project": "cv-people-counter",
+  "description": "Detector-and-tracker pipeline counting people entering/leaving a region, evaluated under crowding, occlusion and different camera views.",
+  "generated_at": "2026-10-11T12:15:13+00:00",
+  "detector": {
+    "model": "models/people_yolo11s_mot.pt",
+    "pretrained": "COCO",
+    "class": "person"
+  },
+  "tracker": {
+    "name": "ByteTrack (custom implementation)",
+    "two_stage_association": true,
+    "kalman_filter": "constant velocity, 8-dim state"
+  },
+  "sequences": [
+    {
+      "name": "MOT17-02-FRCNN",
+      "dataset": "MOT17",
+      "split": "test",
+      "condition": "occlusion",
+      "tags": [
+        "static-elevated",
+        "medium-density"
+      ],
+      "frames": 600,
+      "fps": 30,
+      "resolution": "1920x1080",
+      "imgsz": 1280,
+      "motion_compensation": false,
+      "processing_fps": 10.47,
+      "counting": {
+        "mode_totals": {
+          "pred": {
+            "in": 8,
+            "out": 0
+          },
+          "gt": {
+            "in": 16,
+            "out": 5
+          }
+        },
+        "pred_in": 8,
+        "pred_out": 0,
+        "gt_in": 16,
+        "gt_out": 5,
+        "error_in": 8,
+        "error_out": 5,
+        "counting_accuracy": 0.381,
+        "curve_mae": 2.9583,
+        "mode": "line"
+      },
+      "tracking": {
+        "mota": 0.1906,
+        "motp": 0.2219,
+        "idf1": 0.2724,
+        "idsw": 91,
+        "num_objects": 18581,
+        "num_predictions": 6971,
+        "num_false_positives": 1669,
+        "num_misses": 13279,
+        "mostly_tracked": 7,
+        "partially_tracked": 19,
+        "mostly_lost": 36
+      },
+      "video": null,
+      "avg_gt_people": 31.0
+    },
+    {
+      "name": "MOT20-01",
+      "dataset": "MOT20",
+      "split": "test",
+      "condition": "crowding",
+      "tags": [
+        "static-elevated",
+        "extreme-density"
+      ],
+      "frames": 429,
+      "fps": 25,
+      "resolution": "1920x1080",
+      "imgsz": 1280,
+      "motion_compensation": false,
+      "processing_fps": 12.14,
+      "counting": {
+        "mode_totals": {
+          "pred": {
+            "in": 12,
+            "out": 4
+          },
+          "gt": {
+            "in": 21,
+            "out": 5
+          }
+        },
+        "pred_in": 12,
+        "pred_out": 4,
+        "gt_in": 21,
+        "gt_out": 5,
+        "error_in": 9,
+        "error_out": 1,
+        "counting_accuracy": 0.6154,
+        "curve_mae": 1.875,
+        "mode": "line"
+      },
+      "tracking": {
+        "mota": 0.5299,
+        "motp": 0.2386,
+        "idf1": 0.4673,
+        "idsw": 348,
+        "num_objects": 19870,
+        "num_predictions": 15911,
+        "num_false_positives": 2517,
+        "num_misses": 6476,
+        "mostly_tracked": 27,
+        "partially_tracked": 41,
+        "mostly_lost": 6
+      },
+      "video": null,
+      "avg_gt_people": 46.3
+    },
+    {
+      "name": "MOT17-09-FRCNN",
+      "dataset": "MOT17",
+      "split": "test",
+      "condition": "camera_view",
+      "tags": [
+        "static-low-angle",
+        "low-density"
+      ],
+      "frames": 525,
+      "fps": 30,
+      "resolution": "1920x1080",
+      "imgsz": 640,
+      "motion_compensation": false,
+      "processing_fps": 16.1,
+      "counting": {
+        "mode_totals": {
+          "pred": {
+            "in": 5,
+            "out": 4
+          },
+          "gt": {
+            "in": 10,
+            "out": 3
+          }
+        },
+        "pred_in": 5,
+        "pred_out": 4,
+        "gt_in": 10,
+        "gt_out": 3,
+        "error_in": 5,
+        "error_out": 1,
+        "counting_accuracy": 0.5385,
+        "curve_mae": 1.45,
+        "mode": "line"
+      },
+      "tracking": {
+        "mota": 0.4526,
+        "motp": 0.201,
+        "idf1": 0.483,
+        "idsw": 63,
+        "num_objects": 5325,
+        "num_predictions": 4343,
+        "num_false_positives": 935,
+        "num_misses": 1917,
+        "mostly_tracked": 6,
+        "partially_tracked": 16,
+        "mostly_lost": 4
+      },
+      "video": null,
+      "avg_gt_people": 10.1
+    },
+    {
+      "name": "MOT17-11-FRCNN",
+      "dataset": "MOT17",
+      "split": "test",
+      "condition": "camera_view",
+      "tags": [
+        "moving-handheld",
+        "low-density"
+      ],
+      "frames": 900,
+      "fps": 30,
+      "resolution": "1920x1080",
+      "imgsz": 640,
+      "motion_compensation": true,
+      "processing_fps": 8.88,
+      "counting": {
+        "mode_totals": {
+          "pred": {
+            "in": 9,
+            "out": 9
+          },
+          "gt": {
+            "in": 11,
+            "out": 12
+          }
+        },
+        "pred_in": 9,
+        "pred_out": 9,
+        "gt_in": 11,
+        "gt_out": 12,
+        "error_in": 2,
+        "error_out": 3,
+        "counting_accuracy": 0.7826,
+        "curve_mae": 2.3333,
+        "mode": "line"
+      },
+      "tracking": {
+        "mota": 0.4587,
+        "motp": 0.1548,
+        "idf1": 0.488,
+        "idsw": 43,
+        "num_objects": 9436,
+        "num_predictions": 7139,
+        "num_false_positives": 1384,
+        "num_misses": 3681,
+        "mostly_tracked": 23,
+        "partially_tracked": 16,
+        "mostly_lost": 36
+      },
+      "video": null,
+      "avg_gt_people": 10.5
+    }
+  ],
+  "by_condition": {
+    "camera_view": {
+      "sequences": [
+        "MOT17-09-FRCNN",
+        "MOT17-11-FRCNN"
+      ],
+      "mean_counting_accuracy": 0.6605,
+      "mean_curve_mae": 1.8916,
+      "rmse_total_count_error": 5.5227,
+      "mean_idf1": 0.4855,
+      "mean_mota": 0.4556
+    },
+    "crowding": {
+      "sequences": [
+        "MOT20-01"
+      ],
+      "mean_counting_accuracy": 0.6154,
+      "mean_curve_mae": 1.875,
+      "rmse_total_count_error": 10.0,
+      "mean_idf1": 0.4673,
+      "mean_mota": 0.5299
+    },
+    "occlusion": {
+      "sequences": [
+        "MOT17-02-FRCNN"
+      ],
+      "mean_counting_accuracy": 0.381,
+      "mean_curve_mae": 2.9583,
+      "rmse_total_count_error": 13.0,
+      "mean_idf1": 0.2724,
+      "mean_mota": 0.1906
+    },
+    "overall": {
+      "sequences": [
+        "MOT17-02-FRCNN",
+        "MOT20-01",
+        "MOT17-09-FRCNN",
+        "MOT17-11-FRCNN"
+      ],
+      "mean_counting_accuracy": 0.5794,
+      "mean_curve_mae": 2.1542,
+      "rmse_total_count_error": 9.083,
+      "mean_idf1": 0.4277,
+      "mean_mota": 0.408
+    }
+  }
+}

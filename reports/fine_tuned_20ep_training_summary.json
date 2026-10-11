@@ -1,0 +1,19 @@
+{
+  "base_model": "yolo11s.pt",
+  "checkpoint": "best.pt",
+  "epochs_completed": 20,
+  "imgsz": 640,
+  "batch": 8,
+  "workers_after_resume": 0,
+  "optimizer": "AdamW",
+  "initial_learning_rate": 0.001,
+  "weight_decay": 0.0005,
+  "seed": 42,
+  "validation_metrics": {
+    "precision": 0.9643904554,
+    "recall": 0.9147143985,
+    "mAP50": 0.9643210745,
+    "mAP50-95": 0.7245573001
+  },
+  "observation": "Improved dense-scene counting but reduced aggregate camera-separated test accuracy."
+}

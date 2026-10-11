@@ -16,13 +16,17 @@ PERSON_CLASS = 0  # COCO
 class YoloDetector:
     """Caches one Ultralytics model; imgsz / conf can be set per call."""
 
-    def __init__(self, weights: str = "yolo11n.pt") -> None:
+    def __init__(self, weights: str = "yolo11n.pt", device: str = "auto") -> None:
         # imported lazily so that unit tests of tracking/counting do not pay
         # the torch import cost
+        import torch
         from ultralytics import YOLO  # noqa: WPS433 (local import on purpose)
 
         self._model = YOLO(weights)
         self.weights = weights
+        self.device = "0" if device == "auto" and torch.cuda.is_available() else (
+            "cpu" if device == "auto" else str(device)
+        )
 
     def __call__(
         self,
@@ -42,7 +46,7 @@ class YoloDetector:
             conf=float(conf),
             iou=float(iou),
             classes=[PERSON_CLASS],
-            device="cpu",
+            device=self.device,
             verbose=False,
         )
         boxes, confs = [], []

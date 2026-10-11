@@ -1,10 +1,9 @@
-# Core dependencies (Python 3.10+; tested on 3.12).
-#qwerty
-# torch is pulled from the CPU-only wheel index (no CUDA bundles:
-# ~500 MB instead of ~2.5 GB) — the pipeline runs on CPU by design.
---extra-index-url https://download.pytorch.org/whl/cpu
+# Core dependencies (Python 3.10+).
+# Install a CUDA build of torch first when a supported NVIDIA GPU is present:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 numpy>=1.26
 torch>=2.2
+torchvision>=0.17
 ultralytics>=8.3.40
 opencv-python-headless>=4.9
 scipy>=1.11

@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Downloaded datasets and generated training links/labels.
+data/
+
+# Large/reproducible runtime artifacts. Selected reports and the final model
+# are force-added explicitly when they are ready for submission.
+outputs/
+yolo*.pt
+

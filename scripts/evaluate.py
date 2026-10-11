@@ -21,15 +21,12 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
 
-from people_counter.config import load_config                      # noqa: E402
-from people_counter.counting.counter import CountingEvent          # noqa: E402
-from people_counter.datasets.gt_counter import gt_count            # noqa: E402
-from people_counter.datasets.mot import (                          # noqa: E402
-    gt_people_per_frame, load_gt_tracks)
-from people_counter.evaluation.counting_metrics import (           # noqa: E402
-    counting_metrics)
-from people_counter.evaluation.mot_metrics import (                # noqa: E402
-    compute_mot_metrics)
+from people_counter.config import load_config
+from people_counter.counting.counter import CountingEvent
+from people_counter.datasets.gt_counter import gt_count
+from people_counter.datasets.mot import gt_people_per_frame, load_gt_tracks
+from people_counter.evaluation.counting_metrics import counting_metrics
+from people_counter.evaluation.mot_metrics import compute_mot_metrics
 
 
 def _events_from_dicts(rows: list[dict]) -> list[CountingEvent]:
@@ -44,6 +41,7 @@ def evaluate_one(seq_cfg: dict, run: dict) -> dict:
     result = {
         "name": meta["name"],
         "dataset": meta["dataset"],
+        "split": seq_cfg.get("split", "unspecified"),
         "condition": meta["condition"],
         "tags": meta["tags"],
         "frames": n_frames,
@@ -175,6 +173,8 @@ def main() -> None:
     parser.add_argument("--config", default=str(REPO / "configs" / "sequences.yaml"))
     parser.add_argument("--runs-dir", default=str(REPO / "outputs" / "runs"))
     parser.add_argument("--seq", action="append")
+    parser.add_argument("--split", choices=["development", "test"],
+                        help="evaluate only one protocol split")
     parser.add_argument("--results", default=str(REPO / "outputs" / "results.json"))
     parser.add_argument("--plots-dir", default=str(REPO / "docs" / "assets"))
     args = parser.parse_args()
@@ -186,6 +186,8 @@ def main() -> None:
 
     for seq_cfg in config["sequences"]:
         if args.seq and seq_cfg["name"] not in set(args.seq):
+            continue
+        if args.split and seq_cfg.get("split") != args.split:
             continue
         run_path = runs_dir / f"{seq_cfg['name']}.json"
         if not run_path.is_file():
@@ -210,7 +212,8 @@ def main() -> None:
                 seq_cfg = dict(seq_cfg, gt=str(ann / f"{seq_dir.name}.txt"))
         res = evaluate_one(seq_cfg, run)
         results.append(res)
-        used_detector = seq_cfg["detector"]["weights"]
+        used_detector = run.get("meta", {}).get("detector_cfg", {}).get(
+            "weights", seq_cfg["detector"]["weights"])
 
     if not results:
         print("[eval] no runs evaluated — run scripts/run_pipeline.py first")
@@ -221,7 +224,9 @@ def main() -> None:
         "description": ("Detector-and-tracker pipeline counting people "
                         "entering/leaving a region, evaluated under crowding, "
                         "occlusion and different camera views."),
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_at": datetime.now(timezone.utc).isoformat(  # noqa: UP017
+            timespec="seconds"
+        ),
         "detector": {"model": used_detector, "pretrained": "COCO",
                      "class": "person"},
         "tracker": {"name": "ByteTrack (custom implementation)",
