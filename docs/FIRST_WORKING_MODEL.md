@@ -18,7 +18,7 @@ complete detector-tracker-counter pipeline:
    trajectories through the same counting geometry. Tracking is evaluated
    separately with standard MOT metrics.
 
-The primary selection metric is mean counting accuracy:
+The primary detector comparison metric is mean counting accuracy:
 
 `CA = max(0, 1 - (|pred_in - gt_in| + |pred_out - gt_out|) / (gt_in + gt_out))`.
 
@@ -34,20 +34,22 @@ annotations are retained. Detector boxes are clipped to the image, boxes under
 0.10 are omitted from detector training. Remaining boxes are converted to
 normalized YOLO `class x_center y_center width height` format.
 
-The split is camera-separated for final evaluation:
+The data are separated by camera for training and model comparison:
 
 | Purpose | Sequences | Frames/images | Boxes |
 |---|---|---:|---:|
 | Train | first 80% of MOT17-04 and MOT17-05 | 1,510 | 39,144 |
 | Validation | final 20% of MOT17-04 and MOT17-05 | 377 | 11,397 |
-| Test | MOT17-02, MOT20-01, MOT17-09, MOT17-11 | 2,454 | not used for training |
+| Model comparison (named `test` in code) | MOT17-02, MOT20-01, MOT17-09, MOT17-11 | 2,454 | not used for training |
+| Untouched final test | not available in this submission | - | - |
 
 The chronological split avoids near-duplicate adjacent train/validation
-frames being mixed randomly. More importantly, none of the four test cameras
-is exported by `prepare_training_data.py`. VisDrone is present as an optional
-configuration, but it is excluded from this report because the configured
-sequence was not available through the reproducible downloader during this
-run. No result is imputed for missing data.
+frames being mixed randomly. None of the four comparison cameras is exported
+by `prepare_training_data.py`. However, their counting results were used to
+select the 3-epoch model, so they are not an independent final test set.
+VisDrone is present as an optional configuration, but it is excluded from this
+report because the configured sequence was not available through the
+reproducible downloader during this run. No result is imputed for missing data.
 
 Training preprocessing uses 640 px letterboxed input, horizontal flips,
 translation, scale jitter, light mixup, and mosaic augmentation. Inference
@@ -68,7 +70,10 @@ weight decay `0.0005`), batch size 8, AMP, seed 42, deterministic mode, three
 warm-up epochs, and best-checkpoint selection by Ultralytics validation
 fitness. Training ran on an NVIDIA GeForce RTX 4060 Laptop GPU with PyTorch
 2.11.0+cu128 and Ultralytics 8.4.175. We compared checkpoints from a short
-3-epoch run and a full 20-epoch run, both at 640 px.
+3-epoch run and a full 20-epoch run, both at 640 px. Within each run,
+Ultralytics selected its checkpoint using development validation fitness.
+The choice between detector configurations used the four comparison
+sequences described below.
 
 Detector metrics on the development validation frames were:
 
@@ -85,8 +90,11 @@ cannot start tracks by themselves.
 
 ## 4. Initial quantitative results
 
-All aggregate values below are unweighted means across the same four held-out
-test sequences. Higher CA/MOTA/IDF1 and lower curve MAE are better.
+All aggregate values below are unweighted means across the same four cameras.
+They were held out from detector training but **used to compare configurations
+and choose the submitted checkpoint**. Higher CA/MOTA/IDF1 and lower curve
+MAE are better. The observed CA of 0.6548 is therefore a post-selection
+comparison result, not an unbiased estimate of final performance on new data.
 
 | Detector | Mean CA | Curve MAE | MOTA | IDF1 |
 |---|---:|---:|---:|---:|
@@ -97,16 +105,18 @@ test sequences. Higher CA/MOTA/IDF1 and lower curve MAE are better.
 
 Per-sequence results for the selected 3-epoch YOLO11s checkpoint:
 
-| Test sequence | Pred IN/OUT | GT IN/OUT | CA | Curve MAE | MOTA | IDF1 |
+| Comparison sequence | Pred IN/OUT | GT IN/OUT | CA | Curve MAE | MOTA | IDF1 |
 |---|---:|---:|---:|---:|---:|---:|
 | MOT17-02 | 10 / 1 | 16 / 5 | 0.5238 | 2.2500 | 0.1797 | 0.2997 |
 | MOT20-01 | 7 / 2 | 21 / 5 | 0.3462 | 2.8750 | 0.4700 | 0.4433 |
 | MOT17-09 | 9 / 3 | 10 / 3 | **0.9231** | **0.1000** | 0.4770 | 0.4535 |
 | MOT17-11 | 9 / 10 | 11 / 12 | 0.8261 | 1.5833 | **0.5185** | **0.5331** |
 
-The selected checkpoint improves mean CA by 0.1047 absolute over the original
-YOLO11n baseline and by 0.0326 over the larger pretrained baseline. Its main
-gain is on the two camera-view sequences. The full 20-epoch fine-tune improves
+On these four comparison sequences, the selected checkpoint scores 0.1047 CA
+above the original YOLO11n baseline and 0.0326 above the larger pretrained
+baseline. These are observed comparison differences, not unbiased estimates
+of expected gains on new cameras. Its main gain is on the two camera-view
+sequences. The full 20-epoch fine-tune improves
 the difficult dense MOT20-01 sequence from 0.4231 to 0.6154 CA, but lowers
 aggregate CA because it specializes to the two fixed development views.
 
@@ -120,7 +130,11 @@ Machine-readable outputs are stored in `reports/`.
   stable setting.
 - High validation mAP did not guarantee the best end-to-end counting score.
   The validation frames share the same cameras as training; their appearance
-  distribution is narrower than the camera-separated test split.
+  distribution is narrower than the camera-separated comparison split.
+- The four comparison sequences informed model choice. Reusing their score as
+  the final test result would introduce selection bias. A credible final
+  estimate requires freezing the model and evaluation protocol now, then
+  running them once on previously unseen, untouched cameras.
 - Long fine-tuning substantially helps extreme crowding but loses robustness
   under the unseen occlusion and low-angle views. Future training should use
   more cameras and camera-stratified validation, then tune the epoch count on
