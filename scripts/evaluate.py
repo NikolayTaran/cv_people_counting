@@ -9,6 +9,7 @@ Produces:
     docs/assets/*.png             plots for the README
 and prints a summary table.
 """
+# ruff: noqa: E402 -- CLI adds the repository's src directory to sys.path.
 from __future__ import annotations
 
 import argparse
@@ -138,8 +139,8 @@ def make_plots(results: list[dict], out_dir: Path) -> list[str]:
         ax.set_ylabel("Counting accuracy")
         ax.set_title("Counting accuracy by sequence")
         ax.tick_params(axis="x", rotation=20)
-        handles = [plt.Rectangle((0, 0), 1, 1, color=c, label=l)
-                   for l, c in colors.items()]
+        handles = [plt.Rectangle((0, 0), 1, 1, color=color, label=label)
+                   for label, color in colors.items()]
         ax.legend(handles=handles, fontsize=8)
         fig.tight_layout()
         path = out_dir / "counting_accuracy.png"
@@ -212,8 +213,7 @@ def main() -> None:
                 seq_cfg = dict(seq_cfg, gt=str(ann / f"{seq_dir.name}.txt"))
         res = evaluate_one(seq_cfg, run)
         results.append(res)
-        used_detector = run.get("meta", {}).get("detector_cfg", {}).get(
-            "weights", seq_cfg["detector"]["weights"])
+        used_detector = run.get("meta", {}).get("detector_cfg", seq_cfg["detector"])
 
     if not results:
         print("[eval] no runs evaluated — run scripts/run_pipeline.py first")
@@ -227,8 +227,11 @@ def main() -> None:
         "generated_at": datetime.now(timezone.utc).isoformat(  # noqa: UP017
             timespec="seconds"
         ),
-        "detector": {"model": used_detector, "pretrained": "COCO",
-                     "class": "person"},
+        "detector": {"model": used_detector["weights"], "pretrained": "COCO",
+                     "class": "person",
+                     **({"ensemble_with": used_detector["ensemble_with"],
+                         "fusion_iou": used_detector["fusion_iou"]}
+                        if "ensemble_with" in used_detector else {})},
         "tracker": {"name": "ByteTrack (custom implementation)",
                     "two_stage_association": True,
                     "kalman_filter": "constant velocity, 8-dim state"},

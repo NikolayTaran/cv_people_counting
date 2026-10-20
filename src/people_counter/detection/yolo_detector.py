@@ -1,10 +1,8 @@
-"""YOLO11n detector wrapper (Ultralytics, COCO-pretrained, person class).
+"""YOLO11 person detector wrapper used by single-model and ensemble pipelines.
 
-The detector is deliberately thin: the intellectual core of this project is
-the tracker, the counting logic and the evaluation. We only need reliable
-person boxes with raw confidence scores — ByteTrack does its own confidence
-stratification, so we keep the detection threshold very low (0.05) and let
-the tracker's two-stage association sort strong from weak boxes.
+ByteTrack stratifies raw confidence scores, so inference keeps a low 0.05
+confidence floor and lets the tracker's two-stage association handle weak
+boxes from partially occluded pedestrians.
 """
 from __future__ import annotations
 
@@ -20,7 +18,7 @@ class YoloDetector:
         # imported lazily so that unit tests of tracking/counting do not pay
         # the torch import cost
         import torch
-        from ultralytics import YOLO  # noqa: WPS433 (local import on purpose)
+        from ultralytics import YOLO  # local import keeps lightweight tests fast
 
         self._model = YOLO(weights)
         self.weights = weights

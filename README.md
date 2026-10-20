@@ -34,6 +34,23 @@ See [the first working model report](docs/FIRST_WORKING_MODEL.md) for the full
 protocol, per-sequence results, training setup, and limitations. A ready-to-
 submit [PDF version](output/pdf/first_working_model_report.pdf) is included.
 
+## Second approach
+
+The [second approach report](docs/SECOND_APPROACH.md) evaluates a two-detector
+ensemble. It combines the submitted 3-epoch YOLO11s checkpoint with the
+COCO-pretrained YOLO11s detector using confidence-weighted box fusion, then
+feeds the boxes to the unchanged ByteTrack and counting pipeline. On the same
+four camera-separated comparison sequences, mean CA is **0.6654** versus
+**0.6548** for the single detector. This is a small observed gain with lower
+tracking metrics and longer processing time. The four sequences have already
+been used for model comparison, so these are exploratory results rather than
+an independent final test.
+
+```powershell
+python scripts/run_pipeline.py --split test --ensemble-with yolo11s.pt --device 0 --no-render --out-dir outputs/second_approach/comparison/runs
+python scripts/evaluate.py --split test --runs-dir outputs/second_approach/comparison/runs --results outputs/second_approach/comparison/results.json
+```
+
 ## Architecture
 
 ```text
@@ -118,11 +135,12 @@ python -m pytest tests -q
 `run_pipeline.py` also accepts `--seq`, `--imgsz`, and `--max-frames`.
 Omit `--no-render` to create annotated videos.
 
-To regenerate the PDF report after editing its source:
+To regenerate the PDF reports after editing their sources:
 
 ```powershell
 pip install reportlab
 python scripts/build_submission_pdf.py
+python scripts/build_second_approach_pdf.py
 ```
 
 ## Repository layout
@@ -132,14 +150,17 @@ configs/sequences.yaml             experiment splits and per-scene geometry
 scripts/prepare_training_data.py   MOT -> YOLO person dataset exporter
 scripts/train_detector.py          deterministic YOLO11 fine-tuning
 scripts/run_pipeline.py            detector -> tracker -> counter
+src/people_counter/detection/ensemble.py  two-detector box fusion
 scripts/evaluate.py                counting and MOT metrics
 src/people_counter/                pipeline implementation
 models/                             selected trained checkpoint
 reports/                            machine-readable comparisons and protocol note
 docs/FIRST_WORKING_MODEL.md         submission report
+docs/SECOND_APPROACH.md             second approach and measured comparison
 scripts/build_submission_pdf.py     reproducible PDF source
+scripts/build_second_approach_pdf.py  second submission PDF source
 output/pdf/                         ready-to-submit PDF report
-tests/                              39 unit tests
+tests/                              unit tests
 ```
 
 ## Known limitations

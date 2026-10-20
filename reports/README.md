@@ -12,3 +12,10 @@ current pipeline and evaluating it once on new, untouched cameras.
 
 See [the full methodology](../docs/FIRST_WORKING_MODEL.md) for the split,
 training setup, per-sequence counts, and limitations.
+
+The four `second_approach_*.json` files record matched reruns of the single
+detector and the two-detector ensemble on both development and camera-separated
+comparison sequences. See [the second approach report](../docs/SECOND_APPROACH.md)
+for results and interpretation. The development videos contain detector training
+frames; the comparison videos were used during earlier model selection. Neither
+set is an untouched final test.

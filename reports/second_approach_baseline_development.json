@@ -1,0 +1,154 @@
+{
+  "project": "cv-people-counter",
+  "description": "Detector-and-tracker pipeline counting people entering/leaving a region, evaluated under crowding, occlusion and different camera views.",
+  "generated_at": "2026-10-20T14:50:21+00:00",
+  "detector": {
+    "model": "models/people_yolo11s_mot.pt",
+    "pretrained": "COCO",
+    "class": "person"
+  },
+  "tracker": {
+    "name": "ByteTrack (custom implementation)",
+    "two_stage_association": true,
+    "kalman_filter": "constant velocity, 8-dim state"
+  },
+  "sequences": [
+    {
+      "name": "MOT17-05-FRCNN",
+      "dataset": "MOT17",
+      "split": "development",
+      "condition": "occlusion",
+      "tags": [
+        "static-elevated",
+        "low-density"
+      ],
+      "frames": 837,
+      "fps": 14,
+      "resolution": "640x480",
+      "imgsz": 640,
+      "motion_compensation": false,
+      "processing_fps": 70.89,
+      "counting": {
+        "mode_totals": {
+          "pred": {
+            "in": 17,
+            "out": 10
+          },
+          "gt": {
+            "in": 19,
+            "out": 12
+          }
+        },
+        "pred_in": 17,
+        "pred_out": 10,
+        "gt_in": 19,
+        "gt_out": 12,
+        "error_in": 2,
+        "error_out": 2,
+        "counting_accuracy": 0.871,
+        "curve_mae": 1.5938,
+        "mode": "line"
+      },
+      "tracking": {
+        "mota": 0.5566,
+        "motp": 0.2041,
+        "idf1": 0.6128,
+        "idsw": 125,
+        "num_objects": 6917,
+        "num_predictions": 5491,
+        "num_false_positives": 758,
+        "num_misses": 2184,
+        "mostly_tracked": 47,
+        "partially_tracked": 64,
+        "mostly_lost": 22
+      },
+      "video": null,
+      "avg_gt_people": 8.3
+    },
+    {
+      "name": "MOT17-04-FRCNN",
+      "dataset": "MOT17",
+      "split": "development",
+      "condition": "crowding",
+      "tags": [
+        "static-elevated",
+        "high-density"
+      ],
+      "frames": 1050,
+      "fps": 30,
+      "resolution": "1920x1080",
+      "imgsz": 1280,
+      "motion_compensation": false,
+      "processing_fps": 41.66,
+      "counting": {
+        "mode_totals": {
+          "pred": {
+            "in": 4,
+            "out": 9
+          },
+          "gt": {
+            "in": 4,
+            "out": 9
+          }
+        },
+        "pred_in": 4,
+        "pred_out": 9,
+        "gt_in": 4,
+        "gt_out": 9,
+        "error_in": 0,
+        "error_out": 0,
+        "counting_accuracy": 1.0,
+        "curve_mae": 0.2381,
+        "mode": "line"
+      },
+      "tracking": {
+        "mota": 0.5267,
+        "motp": 0.1941,
+        "idf1": 0.6305,
+        "idsw": 222,
+        "num_objects": 47557,
+        "num_predictions": 53795,
+        "num_false_positives": 14263,
+        "num_misses": 8025,
+        "mostly_tracked": 46,
+        "partially_tracked": 24,
+        "mostly_lost": 13
+      },
+      "video": null,
+      "avg_gt_people": 45.3
+    }
+  ],
+  "by_condition": {
+    "crowding": {
+      "sequences": [
+        "MOT17-04-FRCNN"
+      ],
+      "mean_counting_accuracy": 1.0,
+      "mean_curve_mae": 0.2381,
+      "rmse_total_count_error": 0.0,
+      "mean_idf1": 0.6305,
+      "mean_mota": 0.5267
+    },
+    "occlusion": {
+      "sequences": [
+        "MOT17-05-FRCNN"
+      ],
+      "mean_counting_accuracy": 0.871,
+      "mean_curve_mae": 1.5938,
+      "rmse_total_count_error": 4.0,
+      "mean_idf1": 0.6128,
+      "mean_mota": 0.5566
+    },
+    "overall": {
+      "sequences": [
+        "MOT17-05-FRCNN",
+        "MOT17-04-FRCNN"
+      ],
+      "mean_counting_accuracy": 0.9355,
+      "mean_curve_mae": 0.916,
+      "rmse_total_count_error": 2.8284,
+      "mean_idf1": 0.6217,
+      "mean_mota": 0.5416
+    }
+  }
+}
