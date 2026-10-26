@@ -51,6 +51,13 @@ python scripts/run_pipeline.py --split test --ensemble-with yolo11s.pt --device 
 python scripts/evaluate.py --split test --runs-dir outputs/second_approach/comparison/runs --results outputs/second_approach/comparison/results.json
 ```
 
+## Progress check
+
+The [progress check report](docs/PROGRESS_CHECK.md) summarizes all completed
+experiments, the five-configuration comparison, key observations, and the
+remaining work. A [PDF for submission](output/pdf/progress_check_report.pdf)
+is included.
+
 ## Architecture
 
 ```text
@@ -141,6 +148,7 @@ To regenerate the PDF reports after editing their sources:
 pip install reportlab
 python scripts/build_submission_pdf.py
 python scripts/build_second_approach_pdf.py
+python scripts/build_progress_check_pdf.py
 ```
 
 ## Repository layout
@@ -157,8 +165,10 @@ models/                             selected trained checkpoint
 reports/                            machine-readable comparisons and protocol note
 docs/FIRST_WORKING_MODEL.md         submission report
 docs/SECOND_APPROACH.md             second approach and measured comparison
+docs/PROGRESS_CHECK.md              current status and remaining work
 scripts/build_submission_pdf.py     reproducible PDF source
 scripts/build_second_approach_pdf.py  second submission PDF source
+scripts/build_progress_check_pdf.py  progress-check PDF source
 output/pdf/                         ready-to-submit PDF report
 tests/                              unit tests
 ```
