@@ -27,5 +27,5 @@ and single-detector runs plus MOT ground truth with
 person-level matching and cannot by itself prove a detector or tracking cause.
 The audit also records best box IoU at the two missed crossings and the
 best-matching ground-truth identities around the spurious MOT17-09 OUT event.
-`scripts/plot_final_failures.py` renders those event and IoU diagnostics into
-`docs/assets/`.
+`scripts/plot_final_failures.py` renders the track-IoU diagnostic into
+`docs/assets/`; the report presents the three local event windows as a table.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create diagnostic plots from the archived final-report failure evidence."""
+"""Plot the observed track overlap behind the MOT17-09 failure case."""
 
 from __future__ import annotations
 
@@ -24,42 +24,6 @@ NAVY = "#17324D"
 TEAL = "#188C7B"
 ORANGE = "#D77829"
 GRAY = "#7C8790"
-
-
-def plot_event_windows(cases: list[dict]) -> None:
-    fig, axes = plt.subplots(3, 1, figsize=(9.6, 4.6), sharex=True)
-    sources = [
-        ("Ground truth", "nearby_gt_events", 2, NAVY),
-        ("Ensemble", "nearby_pred_events", 1, ORANGE),
-        ("Single detector", "nearby_single_detector_events", 0, TEAL),
-    ]
-    for ax, case in zip(axes, cases):
-        anchor = case["anchor_event"]["frame"]
-        anchor_zero = anchor - 1 if case["anchor"] == "gt" else anchor
-        for label, key, y, color in sources:
-            for event in case[key]:
-                offset = 1 if key == "nearby_gt_events" else 0
-                x = event["frame"] - offset - anchor_zero
-                marker = "^" if event["kind"] == "in" else "v"
-                ax.scatter(x, y, s=75, marker=marker, color=color, zorder=3)
-            ax.axhline(y, color="#E1E8EE", linewidth=0.7, zorder=1)
-        ax.axvline(0, color="#A2B4C2", linestyle="--", linewidth=0.9)
-        ax.set_yticks([0, 1, 2], ["Single", "Ensemble", "GT"])
-        ax.set_ylim(-0.5, 2.5)
-        ax.set_xlim(-12.5, 12.5)
-        frame_type = "GT" if case["anchor"] == "gt" else "predicted"
-        ax.set_title(f'{case["sequence"].replace("-FRCNN", "")}: '
-                     f'{frame_type} frame {anchor}',
-                     loc="left", fontsize=10, fontweight="bold", color=NAVY)
-        ax.spines[["top", "right", "left"]].set_visible(False)
-        ax.tick_params(axis="y", length=0)
-        ax.grid(axis="x", color="#EDF1F4", linewidth=0.6)
-    axes[-1].set_xlabel("Frames relative to cited event (triangle up = IN, down = OUT)")
-    fig.suptitle("Observed count events within +/-12 frames", fontsize=12,
-                 fontweight="bold", color=NAVY)
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
-    fig.savefig(OUT / "final_event_windows.png", dpi=180, facecolor="white")
-    plt.close(fig)
 
 
 def plot_identity_transfer() -> None:
@@ -99,11 +63,7 @@ def plot_identity_transfer() -> None:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    cases = json.loads((ROOT / "reports" / "final_failure_cases.json")
-                       .read_text(encoding="utf-8"))["cases"]
-    plot_event_windows(cases)
     plot_identity_transfer()
-    print(OUT / "final_event_windows.png")
     print(OUT / "final_track58_iou.png")
 
 

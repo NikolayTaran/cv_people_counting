@@ -64,10 +64,10 @@ The [final report](docs/FINAL_REPORT.md) compares all five tested approaches,
 documents matched runtime measurements and three event-level failure cases,
 and states the post-selection evaluation limitation. A [submission PDF](output/pdf/final_report_p29.pdf)
 is included. The [failure audit](reports/final_failure_cases.json) records the
-ground-truth and predicted events behind those examples. The [event
-timeline](docs/assets/final_event_windows.png) and [track-overlap
-plot](docs/assets/final_track58_iou.png) show the observed mismatches and
-apparent identity transfer on MOT17-09.
+ground-truth and predicted events behind those examples. A clear case table
+summarizes the local counting discrepancies, while the [track-overlap
+plot](docs/assets/final_track58_iou.png) shows the apparent identity transfer
+on MOT17-09.
 
 ## Architecture
 

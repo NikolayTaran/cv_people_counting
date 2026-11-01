@@ -140,11 +140,14 @@ every detector failure. The machine-readable audit is in
 `reports/final_failure_cases.json`. MOT ground-truth frames are 1-based and
 predicted frames are 0-based; the diagnostics align them before comparison.
 
-![Event timelines for three audited counting failures](assets/final_event_windows.png)
+| Case (anchor) | Ground-truth events | Single detector | Ensemble |
+|---|---:|---:|---:|
+| MOT20-01, GT frame 70 | 1 IN | No event | No event |
+| MOT17-09, predicted frame 252 | 3 IN, 0 OUT | 3 IN, 0 OUT | 2 IN, 1 OUT |
+| MOT17-11, GT frame 146 | 1 IN | No event | No event |
 
-*Figure 1. Ground-truth, ensemble, and single-detector counting events within
-12 aligned frames of each cited discrepancy. Upward markers indicate IN and
-downward markers indicate OUT.*
+The table counts events within the aligned 12-frame window around each cited
+frame. It describes local discrepancies, not person-level matches.
 
 **Case 1: missed IN under crowding (MOT20-01, frame 70).** The ground-truth
 counter records an IN event for track 23 at frame 70. Neither the three-epoch
@@ -176,7 +179,7 @@ association caused the transfer.
 
 ![IoU of ensemble track 58 with two ground-truth people](assets/final_track58_iou.png)
 
-*Figure 2. Track 58 changes its best-overlapping ground-truth person near the
+*Figure 1. Track 58 changes its best-overlapping ground-truth person near the
 spurious OUT event on MOT17-09. Predicted frames are 0-based; aligned
 ground-truth frames are one greater.*
 
