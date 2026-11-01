@@ -10,7 +10,8 @@ import mistune
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
-from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer
+from reportlab.lib.utils import ImageReader
+from reportlab.platypus import Image, KeepTogether, Paragraph, SimpleDocTemplate, Spacer
 
 from build_submission_pdf import STYLES, callout, page_decoration, table
 
@@ -34,6 +35,10 @@ BODY = ParagraphStyle(
 META = ParagraphStyle(
     "final_meta", parent=STYLES["subtitle"], fontSize=8.5, leading=12,
     spaceAfter=4 * mm,
+)
+CAPTION = ParagraphStyle(
+    "final_caption", parent=STYLES["small"], fontSize=8.2, leading=11.2,
+    spaceAfter=3 * mm,
 )
 
 
@@ -94,7 +99,11 @@ def build() -> None:
     story = [Spacer(1, 3 * mm)]
     title_seen = False
     section_seen = False
-    for block in blocks:
+    section_name = ""
+    skip_blocks: set[int] = set()
+    for index, block in enumerate(blocks):
+        if index in skip_blocks:
+            continue
         kind = block["type"]
         if kind == "blank_line":
             continue
@@ -105,17 +114,42 @@ def build() -> None:
                 story.append(Paragraph(inline(block["children"]), TITLE))
             elif level == 2:
                 section_seen = True
-                story.append(Paragraph(inline(block["children"]), SECTION))
+                section_name = inline(block["children"])
+                story.append(Paragraph(section_name, SECTION))
             else:
                 story.append(Paragraph(inline(block["children"]), STYLES["h2"]))
         elif kind == "paragraph":
+            children = block["children"]
+            if len(children) == 1 and children[0]["type"] == "image":
+                image_path = (SOURCE.parent / children[0]["attrs"]["url"]).resolve()
+                if not image_path.is_relative_to(ROOT):
+                    raise ValueError(f"Figure outside repository: {image_path}")
+                width_px, height_px = ImageReader(str(image_path)).getSize()
+                width = 168 * mm
+                figure = Image(str(image_path), width=width,
+                               height=width * height_px / width_px)
+                next_index = index + 1
+                while next_index < len(blocks) and blocks[next_index]["type"] == "blank_line":
+                    next_index += 1
+                figure_items = [figure, Spacer(1, 1.5 * mm)]
+                if next_index < len(blocks) and blocks[next_index]["type"] == "paragraph":
+                    caption = inline(blocks[next_index]["children"])
+                    if caption.startswith("<i>Figure"):
+                        figure_items.append(Paragraph(caption, CAPTION))
+                        skip_blocks.add(next_index)
+                story.append(KeepTogether(figure_items))
+                continue
             value = inline(block["children"])
             if not section_seen:
                 story.append(Paragraph(value, META))
             elif "All four-camera results in this report are preliminary" in value:
                 story.extend([callout(value), Spacer(1, 2 * mm)])
             else:
-                story.append(Paragraph(value, BODY))
+                body_paragraph = Paragraph(value, BODY)
+                if value.startswith("<b>Case ") or section_name.startswith("6. "):
+                    story.append(KeepTogether([body_paragraph]))
+                else:
+                    story.append(body_paragraph)
         elif kind == "table":
             rows = table_rows(block)
             block_table = table(rows, table_widths(rows[0]))

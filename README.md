@@ -64,7 +64,10 @@ The [final report](docs/FINAL_REPORT.md) compares all five tested approaches,
 documents matched runtime measurements and three event-level failure cases,
 and states the post-selection evaluation limitation. A [submission PDF](output/pdf/final_report_p29.pdf)
 is included. The [failure audit](reports/final_failure_cases.json) records the
-ground-truth and predicted events behind those examples.
+ground-truth and predicted events behind those examples. The [event
+timeline](docs/assets/final_event_windows.png) and [track-overlap
+plot](docs/assets/final_track58_iou.png) show the observed mismatches and
+apparent identity transfer on MOT17-09.
 
 ## Architecture
 
@@ -153,11 +156,13 @@ Omit `--no-render` to create annotated videos.
 To regenerate the PDF reports after editing their sources:
 
 ```powershell
-pip install reportlab
+pip install reportlab mistune
 python scripts/build_submission_pdf.py
 python scripts/build_second_approach_pdf.py
 python scripts/build_progress_check_pdf.py
 python scripts/build_final_report_pdf.py
+python scripts/build_final_failure_audit.py
+python scripts/plot_final_failures.py
 ```
 
 ## Repository layout
@@ -181,6 +186,7 @@ scripts/build_second_approach_pdf.py  second submission PDF source
 scripts/build_progress_check_pdf.py  progress-check PDF source
 scripts/build_final_report_pdf.py   final report PDF source
 scripts/build_final_failure_audit.py  event-level failure audit source
+scripts/plot_final_failures.py      diagnostic figure source
 output/pdf/                         ready-to-submit PDF report
 tests/                              unit tests
 ```

@@ -29,8 +29,65 @@ def event_dict(event) -> dict:
     return {key: getattr(event, key) for key in ("frame", "track_id", "kind", "x", "y")}
 
 
-def nearby(events: list[dict], frame: int) -> list[dict]:
-    return [event for event in events if abs(event["frame"] - frame) <= WINDOW]
+def nearby(events: list[dict], anchor_frame_zero: int,
+           frame_offset: int) -> list[dict]:
+    return [event for event in events
+            if abs(event["frame"] - frame_offset - anchor_frame_zero) <= WINDOW]
+
+
+def box_iou(first, second) -> float:
+    x1 = max(first[0], second[0])
+    y1 = max(first[1], second[1])
+    x2 = min(first[2], second[2])
+    y2 = min(first[3], second[3])
+    intersection = max(0, x2 - x1) * max(0, y2 - y1)
+    area_first = max(0, first[2] - first[0]) * max(0, first[3] - first[1])
+    area_second = max(0, second[2] - second[0]) * max(0, second[3] - second[1])
+    union = area_first + area_second - intersection
+    return float(intersection / union) if union else 0.0
+
+
+def gt_box(row) -> tuple[float, float, float, float]:
+    return (row.x, row.y, row.x + row.w, row.y + row.h)
+
+
+def track_diagnostic(gt, run: dict, event: dict, anchor: str) -> dict:
+    frame = event["frame"]
+    if anchor == "gt":
+        # Run records are 0-based; MOT ground-truth frames are 1-based.
+        row = gt[(gt["frame"] == frame) & (gt["id"] == event["track_id"])].iloc[0]
+        tracks = run["frame_records"][frame - 1]["tracks"]
+        ranked = sorted(
+            ((box_iou(gt_box(row), track[1:]), int(track[0])) for track in tracks),
+            reverse=True,
+        )
+        overlap, track_id = ranked[0] if ranked else (0.0, None)
+        return {
+            "gt_frame": frame,
+            "best_pred_track_id": track_id,
+            "best_pred_track_iou": round(overlap, 4),
+        }
+
+    samples = []
+    for run_frame in (frame - 1, frame, frame + 1):
+        tracks = run["frame_records"][run_frame]["tracks"]
+        track = next(t for t in tracks if int(t[0]) == event["track_id"])
+        rows = gt[gt["frame"] == run_frame + 1]
+        ranked = sorted(
+            ((box_iou(track[1:], gt_box(row)), int(row.id))
+             for _, row in rows.iterrows()),
+            reverse=True,
+        )
+        overlap, gt_id = ranked[0] if ranked else (0.0, None)
+        samples.append({
+            "pred_frame": run_frame,
+            "aligned_gt_frame": run_frame + 1,
+            "pred_track_id": event["track_id"],
+            "foot_x": round((track[1] + track[3]) / 2, 2),
+            "best_gt_id": gt_id,
+            "best_gt_iou": round(overlap, 4),
+        })
+    return {"pred_track_samples": samples}
 
 
 def main() -> None:
@@ -52,16 +109,19 @@ def main() -> None:
         pred_events = [event_dict(e) for e in run["events"]]
         anchor_events = gt_events if anchor == "gt" else pred_events
         selected = next(e for e in anchor_events if e["frame"] == frame and e["kind"] == kind)
+        anchor_frame_zero = frame - 1 if anchor == "gt" else frame
         cases.append({
             "sequence": name,
             "anchor": anchor,
             "anchor_event": selected,
             "window_frames": WINDOW,
-            "nearby_gt_events": nearby(gt_events, frame),
-            "nearby_pred_events": nearby(pred_events, frame),
+            "frame_convention": "GT frames are 1-based; predicted frames are 0-based",
+            "nearby_gt_events": nearby(gt_events, anchor_frame_zero, 1),
+            "nearby_pred_events": nearby(pred_events, anchor_frame_zero, 0),
             "nearby_single_detector_events": nearby(
-                [event_dict(e) for e in baseline["events"]], frame
+                [event_dict(e) for e in baseline["events"]], anchor_frame_zero, 0
             ),
+            "track_diagnostic": track_diagnostic(gt, run, selected, anchor),
             "source_run": f"outputs/second_approach/comparison/runs/{name}.json",
             "source_single_detector_run": (
                 f"outputs/second_approach/baseline_comparison/runs/{name}.json"

@@ -25,3 +25,7 @@ used in the final report. It was generated from the saved matched ensemble
 and single-detector runs plus MOT ground truth with
 `scripts/build_final_failure_audit.py`. Temporal proximity of events is not
 person-level matching and cannot by itself prove a detector or tracking cause.
+The audit also records best box IoU at the two missed crossings and the
+best-matching ground-truth identities around the spurious MOT17-09 OUT event.
+`scripts/plot_final_failures.py` renders those event and IoU diagnostics into
+`docs/assets/`.

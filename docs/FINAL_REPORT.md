@@ -137,17 +137,27 @@ Nearby means within 12 frames of the cited event. Temporal proximity does not
 prove that two events belong to the same person; the causal explanations are
 hypotheses consistent with the logs and scenes, not verified annotations of
 every detector failure. The machine-readable audit is in
-`reports/final_failure_cases.json`.
+`reports/final_failure_cases.json`. MOT ground-truth frames are 1-based and
+predicted frames are 0-based; the diagnostics align them before comparison.
+
+![Event timelines for three audited counting failures](assets/final_event_windows.png)
+
+*Figure 1. Ground-truth, ensemble, and single-detector counting events within
+12 aligned frames of each cited discrepancy. Upward markers indicate IN and
+downward markers indicate OUT.*
 
 **Case 1: missed IN under crowding (MOT20-01, frame 70).** The ground-truth
 counter records an IN event for track 23 at frame 70. Neither the three-epoch
 single detector nor the ensemble produces a counting event within 12 frames.
 At scene level, the ensemble predicts 10 IN and 6 OUT versus 21 IN and 5 OUT
 in ground truth (CA 0.5385). The frame contains many overlapping pedestrians.
-Occlusion, an undetected or low-confidence box, or a broken track before it
-crossed the line could explain the missed event. The current motion/IoU-based
-tracker has no appearance features to recover identity after a long overlap;
-the log does not identify which stage caused this particular miss.
+At the crossing frame, the best saved ensemble track overlaps the ground-truth
+box by only 0.1135 IoU, below the 0.5 matching threshold. The missing event
+therefore coincides with a missing or poorly localized track. Occlusion could
+have disrupted detection or IoU-based association; because raw detector
+confidences were not saved, low confidence cannot be established for this
+person. The tracker has no appearance features to recover identity after a
+long overlap.
 
 **Case 2: spurious or directionally inconsistent OUT (MOT17-09, frame 252).**
 The ensemble records an OUT for predicted track 58 at frame 252. The nearby
@@ -156,9 +166,19 @@ ground-truth OUT within 12 frames. The single-detector run records IN events
 near frames 243, 257, and 259 without this OUT. Across the video, ensemble
 totals are 8 IN / 4 OUT versus 10 IN / 3 OUT in ground truth, and CA falls
 from 0.9231 to 0.7692. Fusion increases false positives on this scene from
-1,108 to 1,478. An extra box, unstable foot point, track fragmentation, or
-crossing-direction error at the manually placed line are plausible causes.
-We cannot prove that the OUT corresponds to one specific ground-truth IN.
+1,108 to 1,478. The saved box of track 58 best overlaps ground-truth person
+11 at aligned GT frame 252 (IoU 0.8087), then person 12 at GT frame 254 (IoU
+0.7721). Its foot point jumps from x=979.51 to x=946.33 across the manually
+placed line at x=960 as the OUT is emitted. This supports an **apparent
+identity transfer** between adjacent people, producing a false directional
+crossing. The saved tracker output cannot establish whether box fusion or
+association caused the transfer.
+
+![IoU of ensemble track 58 with two ground-truth people](assets/final_track58_iou.png)
+
+*Figure 2. Track 58 changes its best-overlapping ground-truth person near the
+spurious OUT event on MOT17-09. Predicted frames are 0-based; aligned
+ground-truth frames are one greater.*
 
 **Case 3: missed IN in a moving-camera view (MOT17-11, frame 146).** Ground
 truth records an IN for track 77 at frame 146; neither approach emits a
@@ -166,10 +186,12 @@ counting event within 12 frames. The ensemble finishes with 7 IN / 11 OUT
 versus 11 IN / 12 OUT in ground truth. Compared with the single detector,
 ensemble identity switches rise from 29 to 52 and false positives from 669
 to 1,567 on this sequence. Camera-motion compensation is enabled, but the
-camera still moves and people overlap. A weak detection, inaccurate motion
-compensation, or IoU-only association losing a track before the line could
-cause this miss. The logs show an event discrepancy and more identity switches
-overall, not a confirmed ID switch for ground-truth track 77.
+camera still moves and people overlap. At GT frame 146, the best saved
+ensemble track overlaps person 77 by only 0.1978 IoU, again below the 0.5
+matching threshold. The immediate failure is a lack of a well-localized track
+at the line. Motion compensation, detection, and IoU-only association are
+possible contributors. The increased scene-level identity switches do not
+prove an ID switch for this specific person.
 
 ## 6. Discussion & Limitations
 

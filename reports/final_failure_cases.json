@@ -11,6 +11,7 @@
         "y": 674.0
       },
       "window_frames": 12,
+      "frame_convention": "GT frames are 1-based; predicted frames are 0-based",
       "nearby_gt_events": [
         {
           "frame": 70,
@@ -22,6 +23,11 @@
       ],
       "nearby_pred_events": [],
       "nearby_single_detector_events": [],
+      "track_diagnostic": {
+        "gt_frame": 70,
+        "best_pred_track_id": 12,
+        "best_pred_track_iou": 0.1135
+      },
       "source_run": "outputs/second_approach/comparison/runs/MOT20-01.json",
       "source_single_detector_run": "outputs/second_approach/baseline_comparison/runs/MOT20-01.json",
       "source_gt": "data/MOT20/train/MOT20-01/gt/gt.txt",
@@ -38,6 +44,7 @@
         "y": 851.8909710805461
       },
       "window_frames": 12,
+      "frame_convention": "GT frames are 1-based; predicted frames are 0-based",
       "nearby_gt_events": [
         {
           "frame": 242,
@@ -107,6 +114,34 @@
           "y": 862.9400968321823
         }
       ],
+      "track_diagnostic": {
+        "pred_track_samples": [
+          {
+            "pred_frame": 251,
+            "aligned_gt_frame": 252,
+            "pred_track_id": 58,
+            "foot_x": 979.51,
+            "best_gt_id": 11,
+            "best_gt_iou": 0.8087
+          },
+          {
+            "pred_frame": 252,
+            "aligned_gt_frame": 253,
+            "pred_track_id": 58,
+            "foot_x": 946.33,
+            "best_gt_id": 11,
+            "best_gt_iou": 0.6296
+          },
+          {
+            "pred_frame": 253,
+            "aligned_gt_frame": 254,
+            "pred_track_id": 58,
+            "foot_x": 929.76,
+            "best_gt_id": 12,
+            "best_gt_iou": 0.7721
+          }
+        ]
+      },
       "source_run": "outputs/second_approach/comparison/runs/MOT17-09-FRCNN.json",
       "source_single_detector_run": "outputs/second_approach/baseline_comparison/runs/MOT17-09-FRCNN.json",
       "source_gt": "data/MOT17/train/MOT17-09-FRCNN/gt/gt.txt",
@@ -123,6 +158,7 @@
         "y": 561.0
       },
       "window_frames": 12,
+      "frame_convention": "GT frames are 1-based; predicted frames are 0-based",
       "nearby_gt_events": [
         {
           "frame": 146,
@@ -134,6 +170,11 @@
       ],
       "nearby_pred_events": [],
       "nearby_single_detector_events": [],
+      "track_diagnostic": {
+        "gt_frame": 146,
+        "best_pred_track_id": 19,
+        "best_pred_track_iou": 0.1978
+      },
       "source_run": "outputs/second_approach/comparison/runs/MOT17-11-FRCNN.json",
       "source_single_detector_run": "outputs/second_approach/baseline_comparison/runs/MOT17-11-FRCNN.json",
       "source_gt": "data/MOT17/train/MOT17-11-FRCNN/gt/gt.txt",
