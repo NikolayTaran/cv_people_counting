@@ -237,7 +237,8 @@ two-detector ensemble reaches the highest observed mean CA, 0.6654, and
 substantially improves the crowded MOT20-01 scene, but worsens MOTA, IDF1,
 Curve MAE, and runtime and loses on two camera-view scenes. Longer
 fine-tuning improves validation mAP and the crowded scene but lowers mean
-comparison CA. Therefore, the operational pipeline and trained checkpoint
-are complete, but evidence of generalization is not: all reported CA values
-are preliminary post-selection comparisons until an untouched final test is
-performed.
+comparison CA. The implemented pipeline and trained checkpoint are complete.
+The reported CA values quantify performance on the four studied sequences.
+Because those sequences also informed model selection, these values are
+preliminary post-selection comparisons; transfer to new cameras requires a
+separate, untouched evaluation.
