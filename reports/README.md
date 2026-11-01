@@ -19,3 +19,9 @@ comparison sequences. See [the second approach report](../docs/SECOND_APPROACH.m
 for results and interpretation. The development videos contain detector training
 frames; the comparison videos were used during earlier model selection. Neither
 set is an untouched final test.
+
+`final_failure_cases.json` archives three frame-level event discrepancies
+used in the final report. It was generated from the saved matched ensemble
+and single-detector runs plus MOT ground truth with
+`scripts/build_final_failure_audit.py`. Temporal proximity of events is not
+person-level matching and cannot by itself prove a detector or tracking cause.

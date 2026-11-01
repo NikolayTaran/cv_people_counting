@@ -1,0 +1,143 @@
+{
+  "cases": [
+    {
+      "sequence": "MOT20-01",
+      "anchor": "gt",
+      "anchor_event": {
+        "frame": 70,
+        "track_id": 23,
+        "kind": "in",
+        "x": 972.0,
+        "y": 674.0
+      },
+      "window_frames": 12,
+      "nearby_gt_events": [
+        {
+          "frame": 70,
+          "track_id": 23,
+          "kind": "in",
+          "x": 972.0,
+          "y": 674.0
+        }
+      ],
+      "nearby_pred_events": [],
+      "nearby_single_detector_events": [],
+      "source_run": "outputs/second_approach/comparison/runs/MOT20-01.json",
+      "source_single_detector_run": "outputs/second_approach/baseline_comparison/runs/MOT20-01.json",
+      "source_gt": "data/MOT20/train/MOT20-01/gt/gt.txt",
+      "interpretation_limit": "Temporal event proximity does not establish person-level correspondence or uniquely identify the causal detector/tracker error."
+    },
+    {
+      "sequence": "MOT17-09-FRCNN",
+      "anchor": "pred",
+      "anchor_event": {
+        "frame": 252,
+        "track_id": 58,
+        "kind": "out",
+        "x": 946.3349358195093,
+        "y": 851.8909710805461
+      },
+      "window_frames": 12,
+      "nearby_gt_events": [
+        {
+          "frame": 242,
+          "track_id": 1,
+          "kind": "in",
+          "x": 975.0,
+          "y": 771.0
+        },
+        {
+          "frame": 253,
+          "track_id": 11,
+          "kind": "in",
+          "x": 975.0,
+          "y": 804.0
+        },
+        {
+          "frame": 258,
+          "track_id": 12,
+          "kind": "in",
+          "x": 982.0,
+          "y": 876.0
+        }
+      ],
+      "nearby_pred_events": [
+        {
+          "frame": 243,
+          "track_id": 51,
+          "kind": "in",
+          "x": 981.4932232454671,
+          "y": 750.2563049275618
+        },
+        {
+          "frame": 250,
+          "track_id": 47,
+          "kind": "in",
+          "x": 987.6802888520881,
+          "y": 789.2983398988029
+        },
+        {
+          "frame": 252,
+          "track_id": 58,
+          "kind": "out",
+          "x": 946.3349358195093,
+          "y": 851.8909710805461
+        }
+      ],
+      "nearby_single_detector_events": [
+        {
+          "frame": 243,
+          "track_id": 37,
+          "kind": "in",
+          "x": 984.1458893482969,
+          "y": 757.8700330456629
+        },
+        {
+          "frame": 257,
+          "track_id": 22,
+          "kind": "in",
+          "x": 980.8033039481581,
+          "y": 868.0211799199269
+        },
+        {
+          "frame": 259,
+          "track_id": 27,
+          "kind": "in",
+          "x": 1001.9358528472018,
+          "y": 862.9400968321823
+        }
+      ],
+      "source_run": "outputs/second_approach/comparison/runs/MOT17-09-FRCNN.json",
+      "source_single_detector_run": "outputs/second_approach/baseline_comparison/runs/MOT17-09-FRCNN.json",
+      "source_gt": "data/MOT17/train/MOT17-09-FRCNN/gt/gt.txt",
+      "interpretation_limit": "Temporal event proximity does not establish person-level correspondence or uniquely identify the causal detector/tracker error."
+    },
+    {
+      "sequence": "MOT17-11-FRCNN",
+      "anchor": "gt",
+      "anchor_event": {
+        "frame": 146,
+        "track_id": 77,
+        "kind": "in",
+        "x": 970.0,
+        "y": 561.0
+      },
+      "window_frames": 12,
+      "nearby_gt_events": [
+        {
+          "frame": 146,
+          "track_id": 77,
+          "kind": "in",
+          "x": 970.0,
+          "y": 561.0
+        }
+      ],
+      "nearby_pred_events": [],
+      "nearby_single_detector_events": [],
+      "source_run": "outputs/second_approach/comparison/runs/MOT17-11-FRCNN.json",
+      "source_single_detector_run": "outputs/second_approach/baseline_comparison/runs/MOT17-11-FRCNN.json",
+      "source_gt": "data/MOT17/train/MOT17-11-FRCNN/gt/gt.txt",
+      "interpretation_limit": "Temporal event proximity does not establish person-level correspondence or uniquely identify the causal detector/tracker error."
+    }
+  ]
+}

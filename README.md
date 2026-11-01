@@ -58,6 +58,14 @@ experiments, the five-configuration comparison, key observations, and the
 remaining work. A [PDF for submission](output/pdf/progress_check_report.pdf)
 is included.
 
+## Final course report
+
+The [final report](docs/FINAL_REPORT.md) compares all five tested approaches,
+documents matched runtime measurements and three event-level failure cases,
+and states the post-selection evaluation limitation. A [submission PDF](output/pdf/final_report_p29.pdf)
+is included. The [failure audit](reports/final_failure_cases.json) records the
+ground-truth and predicted events behind those examples.
+
 ## Architecture
 
 ```text
@@ -149,6 +157,7 @@ pip install reportlab
 python scripts/build_submission_pdf.py
 python scripts/build_second_approach_pdf.py
 python scripts/build_progress_check_pdf.py
+python scripts/build_final_report_pdf.py
 ```
 
 ## Repository layout
@@ -166,9 +175,12 @@ reports/                            machine-readable comparisons and protocol no
 docs/FIRST_WORKING_MODEL.md         submission report
 docs/SECOND_APPROACH.md             second approach and measured comparison
 docs/PROGRESS_CHECK.md              current status and remaining work
+docs/FINAL_REPORT.md                 final report and failure analysis
 scripts/build_submission_pdf.py     reproducible PDF source
 scripts/build_second_approach_pdf.py  second submission PDF source
 scripts/build_progress_check_pdf.py  progress-check PDF source
+scripts/build_final_report_pdf.py   final report PDF source
+scripts/build_final_failure_audit.py  event-level failure audit source
 output/pdf/                         ready-to-submit PDF report
 tests/                              unit tests
 ```
