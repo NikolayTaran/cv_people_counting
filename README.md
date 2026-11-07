@@ -11,7 +11,7 @@ reproducible experiment reports.
 - [Seven-slide presentation text](docs/FINAL_PRESENTATION.md)
 - [Seven-slide presentation PDF](output/pdf/final_presentation_p29.pdf)
 - [Two-minute demo instructions](docs/FINAL_DEMO_PLAN.md)
-- [Team contributions template](docs/TEAM_CONTRIBUTIONS_TEMPLATE.md) — proposed roles must be confirmed by the team
+- [Team contributions](docs/TEAM_CONTRIBUTIONS.md)
 - [Moodle submission checklist](docs/MOODLE_SUBMISSION.md)
 - [Full final report](docs/FINAL_REPORT.md) and [PDF](output/pdf/final_report_p29.pdf)
 
@@ -253,7 +253,7 @@ docs/FINAL_REPORT.md                 final report and failure analysis
 docs/FINAL_TECHNICAL_SUMMARY.md       two-page technical handout
 docs/FINAL_PRESENTATION.md            seven-slide presentation text
 docs/FINAL_DEMO_PLAN.md               two-minute demo instructions
-docs/TEAM_CONTRIBUTIONS_TEMPLATE.md   unconfirmed contribution template
+docs/TEAM_CONTRIBUTIONS.md            final contribution statement
 docs/MOODLE_SUBMISSION.md              final submission checklist
 scripts/build_submission_pdf.py     reproducible PDF source
 scripts/build_second_approach_pdf.py  second submission PDF source
