@@ -5,6 +5,19 @@ line. It contains dataset preparation, YOLO11 detector training, a custom
 ByteTrack implementation, directional counting, MOT/counting evaluation, and
 reproducible experiment reports.
 
+## Final submission package
+
+- [Two-page technical summary](docs/FINAL_TECHNICAL_SUMMARY.md) and its [PDF](output/pdf/final_technical_summary_p29.pdf)
+- [Seven-slide presentation text](docs/FINAL_PRESENTATION.md)
+- [Two-minute demo instructions](docs/FINAL_DEMO_PLAN.md)
+- [Team contributions template](docs/TEAM_CONTRIBUTIONS_TEMPLATE.md) — proposed roles must be confirmed by the team
+- [Full final report](docs/FINAL_REPORT.md) and [PDF](output/pdf/final_report_p29.pdf)
+
+The code, trained checkpoint, evaluation outputs, and documentation are ready.
+The comparison cameras informed model selection, so the numerical results are
+**preliminary post-selection comparisons**; this is an evaluation limitation,
+not an incomplete pipeline.
+
 ## Current result
 
 The camera-separated comparison set contains 2,454 frames from MOT17-02,
@@ -16,14 +29,16 @@ numbers are **post-selection results, not an unbiased final test estimate**.
 
 | Detector | Mean CA | Curve MAE | MOTA | IDF1 |
 |---|---:|---:|---:|---:|
-| YOLO11n, COCO pretrained | 0.5501 | 2.5913 | 0.4361 | 0.4446 |
-| YOLO11s, COCO pretrained | 0.6222 | 1.9747 | **0.4352** | **0.4671** |
+| YOLO11n, COCO pretrained | 0.5501 | 2.5913 | **0.4361** | 0.4446 |
+| YOLO11s, COCO pretrained | 0.6222 | 1.9747 | 0.4352 | **0.4671** |
 | **YOLO11s, 3-epoch MOT fine-tune** | **0.6548** | **1.7021** | 0.4113 | 0.4324 |
 | YOLO11s, 20-epoch MOT fine-tune | 0.5794 | 2.1542 | 0.4080 | 0.4277 |
+| **Two-detector ensemble** | **0.6654** | 1.7858 | 0.3989 | 0.4261 |
 
 The selected 3-epoch fine-tune has the best observed aggregate counting result
-on this comparison set: CA `0.6548`, 0.1047 absolute above the original
-baseline. A longer 20-epoch run
+among single detectors on this comparison set: CA `0.6548`, 0.1047 absolute
+above the original baseline. The ensemble reaches `0.6654` but has worse
+Curve MAE, tracking metrics, and runtime. A longer 20-epoch run
 reaches `mAP50=0.9643` and `mAP50-95=0.7246` on development validation and
 raises CA on dense MOT20-01 from 0.4231 to 0.6154, but it specializes to the
 two development views and scores lower on the comparison sequences. This is
@@ -150,6 +165,57 @@ python scripts/evaluate.py --split test --runs-dir outputs/trained/runs --result
 python -m pytest tests -q
 ```
 
+### Reproduce the five-way comparison
+
+The commands below use the repository's comparison split, called `test` by the
+CLI. It is **post-selection**, because these videos were used to select the
+checkpoint. Download the data first using the commands above. The 3-epoch
+checkpoint is committed; retraining is optional for reproducing inference.
+Ultralytics downloads COCO checkpoints on first use. The 20-epoch checkpoint
+is not committed. Generate it separately so the submitted 3-epoch checkpoint
+is preserved; the archived 20-epoch metrics are in
+`reports/fine_tuned_20ep_test.json`.
+
+```powershell
+# COCO baselines
+python scripts/run_pipeline.py --split test --weights yolo11n.pt --device 0 --no-render --out-dir outputs/final/yolo11n/runs
+python scripts/evaluate.py --split test --runs-dir outputs/final/yolo11n/runs --results outputs/final/yolo11n/results.json --plots-dir outputs/final/yolo11n/plots
+python scripts/run_pipeline.py --split test --weights yolo11s.pt --device 0 --no-render --out-dir outputs/final/yolo11s/runs
+python scripts/evaluate.py --split test --runs-dir outputs/final/yolo11s/runs --results outputs/final/yolo11s/results.json --plots-dir outputs/final/yolo11s/plots
+
+# Selected 3-epoch model
+python scripts/run_pipeline.py --split test --weights models/people_yolo11s_mot.pt --device 0 --no-render --out-dir outputs/final/three_epoch/runs
+python scripts/evaluate.py --split test --runs-dir outputs/final/three_epoch/runs --results outputs/final/three_epoch/results.json --plots-dir outputs/final/three_epoch/plots
+
+# Two-detector ensemble (same tracker and line settings)
+python scripts/run_pipeline.py --split test --weights models/people_yolo11s_mot.pt --ensemble-with yolo11s.pt --fusion-iou 0.55 --device 0 --no-render --out-dir outputs/final/ensemble/runs
+python scripts/evaluate.py --split test --runs-dir outputs/final/ensemble/runs --results outputs/final/ensemble/results.json --plots-dir outputs/final/ensemble/plots
+
+# Optional: rebuild and evaluate the 20-epoch checkpoint (requires training time)
+python scripts/train_detector.py --epochs 20 --imgsz 640 --batch 8 --workers 0 --device 0 --name yolo11s_mot_people_20ep --output-checkpoint models/people_yolo11s_mot_20ep.pt
+python scripts/run_pipeline.py --split test --weights models/people_yolo11s_mot_20ep.pt --device 0 --no-render --out-dir outputs/final/twenty_epoch/runs
+python scripts/evaluate.py --split test --runs-dir outputs/final/twenty_epoch/runs --results outputs/final/twenty_epoch/results.json --plots-dir outputs/final/twenty_epoch/plots
+```
+
+`reports/` contains the archived five-way results, including the 20-epoch
+run. Do not compare new timings with the archived timings without matching
+hardware, input sizes, rendering mode, and software environment.
+
+### Prepare demo clips
+
+These commands render annotated MP4 files with person boxes, track IDs, line,
+and directional count overlay. `--max-frames` starts from frame zero; the
+MOT17-09 command includes the audited event near predicted frame 252.
+
+```powershell
+python scripts/run_pipeline.py --seq MOT20-01 --weights models/people_yolo11s_mot.pt --max-frames 180 --device 0 --out-dir outputs/demo/mot20_single/runs --video-dir outputs/demo/mot20_single/videos
+python scripts/run_pipeline.py --seq MOT20-01 --weights models/people_yolo11s_mot.pt --ensemble-with yolo11s.pt --max-frames 180 --device 0 --out-dir outputs/demo/mot20_ensemble/runs --video-dir outputs/demo/mot20_ensemble/videos
+python scripts/run_pipeline.py --seq MOT17-09-FRCNN --weights models/people_yolo11s_mot.pt --ensemble-with yolo11s.pt --max-frames 270 --device 0 --out-dir outputs/demo/mot17_09_ensemble/runs --video-dir outputs/demo/mot17_09_ensemble/videos
+```
+
+The MP4s are written to each `outputs/demo/.../videos/` directory. These
+short clips are for presentation; full-sequence results are in `reports/`.
+
 `run_pipeline.py` also accepts `--seq`, `--imgsz`, and `--max-frames`.
 Omit `--no-render` to create annotated videos.
 
@@ -161,6 +227,7 @@ python scripts/build_submission_pdf.py
 python scripts/build_second_approach_pdf.py
 python scripts/build_progress_check_pdf.py
 python scripts/build_final_report_pdf.py
+python scripts/build_technical_summary_pdf.py
 python scripts/build_final_failure_audit.py
 python scripts/plot_final_failures.py
 ```
@@ -181,10 +248,15 @@ docs/FIRST_WORKING_MODEL.md         submission report
 docs/SECOND_APPROACH.md             second approach and measured comparison
 docs/PROGRESS_CHECK.md              current status and remaining work
 docs/FINAL_REPORT.md                 final report and failure analysis
+docs/FINAL_TECHNICAL_SUMMARY.md       two-page technical handout
+docs/FINAL_PRESENTATION.md            seven-slide presentation text
+docs/FINAL_DEMO_PLAN.md               two-minute demo instructions
+docs/TEAM_CONTRIBUTIONS_TEMPLATE.md   unconfirmed contribution template
 scripts/build_submission_pdf.py     reproducible PDF source
 scripts/build_second_approach_pdf.py  second submission PDF source
 scripts/build_progress_check_pdf.py  progress-check PDF source
 scripts/build_final_report_pdf.py   final report PDF source
+scripts/build_technical_summary_pdf.py  technical-summary PDF source
 scripts/build_final_failure_audit.py  event-level failure audit source
 scripts/plot_final_failures.py      diagnostic figure source
 output/pdf/                         ready-to-submit PDF report

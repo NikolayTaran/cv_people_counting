@@ -21,6 +21,9 @@ def main() -> None:
     parser.add_argument("--device", default="0")
     parser.add_argument("--workers", type=int, default=0)
     parser.add_argument("--name", default="yolo11s_mot_people")
+    parser.add_argument("--output-checkpoint", type=Path,
+                        default=REPO / "models" / "people_yolo11s_mot.pt",
+                        help="where to copy the best checkpoint")
     parser.add_argument("--resume", action="store_true",
                         help="resume an interrupted Ultralytics checkpoint")
     args = parser.parse_args()
@@ -72,16 +75,18 @@ def main() -> None:
     best = run_dir / "weights" / "best.pt"
     if not best.is_file():
         raise RuntimeError(f"training finished without {best}")
-    model_dir = REPO / "models"
-    model_dir.mkdir(exist_ok=True)
-    final = model_dir / "people_yolo11s_mot.pt"
+    final = args.output_checkpoint
+    if not final.is_absolute():
+        final = REPO / final
+    final.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(best, final)
 
     metrics = {key: float(value) for key, value in result.results_dict.items()}
     train_args = model.trainer.args
     summary = {
         "base_model": args.model,
-        "final_model": str(final.relative_to(REPO)),
+        "final_model": str(final.relative_to(REPO)
+                           if final.is_relative_to(REPO) else final),
         "epochs_requested": int(train_args.epochs),
         "imgsz": int(train_args.imgsz),
         "batch": int(train_args.batch),
