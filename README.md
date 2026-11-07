@@ -9,8 +9,10 @@ reproducible experiment reports.
 
 - [Two-page technical summary](docs/FINAL_TECHNICAL_SUMMARY.md) and its [PDF](output/pdf/final_technical_summary_p29.pdf)
 - [Seven-slide presentation text](docs/FINAL_PRESENTATION.md)
+- [Seven-slide presentation PDF](output/pdf/final_presentation_p29.pdf)
 - [Two-minute demo instructions](docs/FINAL_DEMO_PLAN.md)
 - [Team contributions template](docs/TEAM_CONTRIBUTIONS_TEMPLATE.md) — proposed roles must be confirmed by the team
+- [Moodle submission checklist](docs/MOODLE_SUBMISSION.md)
 - [Full final report](docs/FINAL_REPORT.md) and [PDF](output/pdf/final_report_p29.pdf)
 
 The code, trained checkpoint, evaluation outputs, and documentation are ready.
@@ -252,6 +254,7 @@ docs/FINAL_TECHNICAL_SUMMARY.md       two-page technical handout
 docs/FINAL_PRESENTATION.md            seven-slide presentation text
 docs/FINAL_DEMO_PLAN.md               two-minute demo instructions
 docs/TEAM_CONTRIBUTIONS_TEMPLATE.md   unconfirmed contribution template
+docs/MOODLE_SUBMISSION.md              final submission checklist
 scripts/build_submission_pdf.py     reproducible PDF source
 scripts/build_second_approach_pdf.py  second submission PDF source
 scripts/build_progress_check_pdf.py  progress-check PDF source
