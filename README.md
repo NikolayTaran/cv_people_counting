@@ -218,6 +218,23 @@ python scripts/run_pipeline.py --seq MOT17-09-FRCNN --weights models/people_yolo
 The MP4s are written to each `outputs/demo/.../videos/` directory. These
 short clips are for presentation; full-sequence results are in `reports/`.
 
+### Run on an external video
+
+`scripts/run_video.py` accepts a normal local MP4, MOV, or WebM file without
+MOT annotations. For example, the external presentation clip is a
+[fixed-camera street scene by Omar Ramadan on Pexels](https://www.pexels.com/video/people-crossing-the-street-5631418/).
+Download the clip locally, then run:
+
+```powershell
+python scripts/run_video.py --input path/to/your_video.mp4 --weights models/people_yolo11s_mot.pt --device 0 --imgsz 960 --max-frames 600 --line 0.5 0.2 0.5 0.95 --out-video outputs/demo/external/annotated.mp4 --out-json outputs/demo/external/events.json
+```
+
+The line coordinates are fractions of video width/height. For the vertical
+line shown above, left-to-right is IN and right-to-left is OUT; pass
+`--in-direction negative` to reverse the labels. The JSON and annotated MP4
+contain model predictions only. Without manual ground-truth annotations,
+external demo counts are not CA/MOTA/IDF1 results or an independent test.
+
 `run_pipeline.py` also accepts `--seq`, `--imgsz`, and `--max-frames`.
 Omit `--no-render` to create annotated videos.
 
