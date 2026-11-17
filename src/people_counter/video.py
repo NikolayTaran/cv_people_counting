@@ -15,14 +15,24 @@ import numpy as np
 
 
 def _find_ffmpeg() -> str | None:
-    exe = shutil.which("ffmpeg")
-    if exe:
-        return exe
+    candidates = [shutil.which("ffmpeg")]
     try:  # imageio-ffmpeg ships a static ffmpeg binary
         import imageio_ffmpeg
-        return imageio_ffmpeg.get_ffmpeg_exe()
+        candidates.append(imageio_ffmpeg.get_ffmpeg_exe())
     except Exception:  # pragma: no cover - optional dependency
-        return None
+        pass
+    for exe in candidates:
+        if not exe:
+            continue
+        try:
+            if subprocess.run(
+                [exe, "-version"], stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=5, check=False,
+            ).returncode == 0:
+                return exe
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+    return None
 
 
 class VideoSink:
@@ -58,6 +68,8 @@ class VideoSink:
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")
             self._cv_writer = cv2.VideoWriter(
                 str(self.path), fourcc, self.fps, (self.width, self.height))
+            if not self._cv_writer.isOpened():
+                raise RuntimeError(f"could not open video writer for {self.path}")
             self._writer = self._cv_write
 
     # ------------------------------------------------------------------ writing

@@ -6,6 +6,7 @@ torch>=2.2
 torchvision>=0.17
 ultralytics>=8.3.40
 opencv-python-headless>=4.9
+imageio-ffmpeg>=0.5     # portable H.264 MP4 output for the demo
 scipy>=1.11
 pandas>=2.2
 motmetrics>=1.4
